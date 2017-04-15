@@ -1,3 +1,0 @@
-[submodule "3rdparties"]
-	path = 3rdparties
-	url = https://github.com/civetweb/civetweb.git
