@@ -3,13 +3,19 @@
 
 #include <QVariantMap>
 
+#include <functional>
+
 #include "CivetServer.h"
 
-class webserver : public QObject, public CivetHandler
+using ServiceCallback = std::function<QVariantMap()>;
+
+class WebServer : public QObject, public CivetHandler
 {
     Q_OBJECT
 public:
-    explicit webserver(QObject *parent = 0);
+    explicit WebServer(QObject *parent = 0);
+    void setBasePath(const QString& path);
+    void registerDataService(const QString& serviceKey, ServiceCallback callback);
 
 signals:
 
@@ -26,7 +32,9 @@ public:
     bool handlePatch(CivetServer *server, mg_connection *conn);
 
 protected:
+    QString basePath = ":";
     QVariantMap cache;
+    QMap<QString, ServiceCallback> services;
 };
 
 #endif // WEBSERVER_H

@@ -2,44 +2,63 @@
 
 #include <QDebug>
 #include <QFile>
+#include <QJsonDocument>
+#include <QJsonObject>
 
-webserver::webserver(QObject *parent) : QObject(parent)
+WebServer::WebServer(QObject *parent) : QObject(parent)
 {
 }
 
-bool webserver::handleGet(CivetServer *, mg_connection *conn)
+void WebServer::setBasePath(const QString &path)
+{
+    basePath = path;
+}
+
+bool WebServer::handleGet(CivetServer *, mg_connection *conn)
 {
     const struct mg_request_info *req_info = mg_get_request_info(conn);
 
     qDebug()  << req_info->request_uri;
 
-    QString filePath = QString::fromLocal8Bit(req_info->request_uri);
-    filePath.remove(0, 1);
+    QString requestUri = QString::fromLocal8Bit(req_info->request_uri);
+    requestUri.remove(0, 1);
 
-    if(filePath.isEmpty())
-        filePath = "index.html";
+    if(services.contains(requestUri))
+    {
+        auto data = services[requestUri]();
+        QJsonDocument doc = QJsonDocument(QJsonObject::fromVariantMap(data));
+        mg_printf(conn, "HTTP/1.1 200 OK\r\nContent-Type: application/jsonl\r\nConnection: close\r\n\r\n");
+        mg_printf(conn, doc.toJson().data());
+        mg_printf(conn, "\r\n");
 
-    filePath = ":/" + filePath;
+        qDebug() << "served service data " << requestUri;
+
+        return true;
+    }
+
+    if(requestUri.isEmpty())
+        requestUri = "index.html";
+    requestUri = basePath + "/" + requestUri;
 
 
-    if(!cache.contains(filePath) || cache[filePath].toString().isEmpty())
+    if(!cache.contains(requestUri) || cache[requestUri].toString().isEmpty())
     {
         QString content;
-        QFile mainF(filePath);
+        QFile mainF(requestUri);
         if(mainF.open(QIODevice::ReadOnly))
             content = QString::fromLatin1(mainF.readAll());
         else
         {
-            qWarning() << "cannot open file " << filePath;
+            qWarning() << "cannot open file " << requestUri;
             return false;
         }
         mainF.close();
-        cache[filePath] = content;
+        cache[requestUri] = content;
     }
 
-    QString file = cache[filePath].toString();
+    QString file = cache[requestUri].toString();
 
-    qDebug() << "served " << filePath;
+    qDebug() << "served " << requestUri;
 
     mg_printf(conn, "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nConnection: close\r\n\r\n");
     mg_printf(conn, file.toStdString().c_str());
@@ -48,38 +67,43 @@ bool webserver::handleGet(CivetServer *, mg_connection *conn)
     return true;
 }
 
-bool webserver::handlePost(CivetServer*, mg_connection *)
+bool WebServer::handlePost(CivetServer*, mg_connection *)
 {
     qDebug() << "post not supported";
     return false;
 }
 
-bool webserver::handleHead(CivetServer *, mg_connection *)
+bool WebServer::handleHead(CivetServer *, mg_connection *)
 {
     qDebug() << "head not supported";
     return false;
 }
 
-bool webserver::handlePut(CivetServer *, mg_connection *)
+bool WebServer::handlePut(CivetServer *, mg_connection *)
 {
     qDebug() << "put not supported";
     return false;
 }
 
-bool webserver::handleDelete(CivetServer *, mg_connection *)
+bool WebServer::handleDelete(CivetServer *, mg_connection *)
 {
     qDebug() << "delete not supported";
     return false;
 }
 
-bool webserver::handleOptions(CivetServer *, mg_connection *)
+bool WebServer::handleOptions(CivetServer *, mg_connection *)
 {
     qDebug() << "options not supported";
     return false;
 }
 
-bool webserver::handlePatch(CivetServer *, mg_connection *)
+bool WebServer::handlePatch(CivetServer *, mg_connection *)
 {
     qDebug() << "patch not supported";
     return false;
+}
+
+void WebServer::registerDataService(const QString& serviceKey, ServiceCallback callback)
+{
+    services[serviceKey] = callback;
 }

@@ -5,6 +5,7 @@
 #include <ctime>
 
 #include "webserver.h"
+#include "ressourceaccess.h"
 
 #ifdef _WIN32
     #include <windows.h>
@@ -23,9 +24,13 @@ int main(int argc, char *argv[])
 
     CivetServer server(cpp_options); // <-- C++ style start
 
-    webserver wserver;
+    WebServer wServer;
+    RessourceAccess rAccess;
 
-    server.addHandler("", wserver);
+    server.addHandler("", wServer);
+    wServer.registerDataService("data", [&]() {
+        return rAccess.getData();
+    });
 
     return a.exec();
 }
