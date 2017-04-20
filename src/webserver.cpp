@@ -5,8 +5,14 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
-WebServer::WebServer(QObject *parent) : QObject(parent)
+WebServer::WebServer(QObject *parent)
+    : QObject(parent)
+    , CivetHandler()
 {
+    std::vector<std::string> cpp_options = { "listening_ports", "8080"};
+    server.reset(new CivetServer(cpp_options));
+
+    server->addHandler("", *this);
 }
 
 void WebServer::setBasePath(const QString &path)

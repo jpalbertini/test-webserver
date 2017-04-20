@@ -4,6 +4,7 @@
 #include <QVariantMap>
 
 #include <functional>
+#include <memory>
 
 #include "CivetServer.h"
 
@@ -17,10 +18,6 @@ public:
     void setBasePath(const QString& path);
     void registerDataService(const QString& serviceKey, ServiceCallback callback);
 
-signals:
-
-public slots:
-
     // CivetHandler interface
 public:
     bool handleGet(CivetServer *server, mg_connection *conn);
@@ -32,7 +29,8 @@ public:
     bool handlePatch(CivetServer *server, mg_connection *conn);
 
 protected:
-    QString basePath = ":";
+    std::unique_ptr<CivetServer> server;
+    QString basePath = ":/www";
     QVariantMap cache;
     QMap<QString, ServiceCallback> services;
 };

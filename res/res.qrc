@@ -1,7 +1,10 @@
 <RCC>
     <qresource prefix="/">
-        <file>index.html</file>
-        <file>todo.css</file>
-        <file>todo.js</file>
+        <file>www/index.html</file>
+        <file>www/index.css</file>
+        <file>www/index.js</file>
+        <file>www/page1.htm</file>
+        <file>www/page2.htm</file>
+        <file>www/page3.htm</file>
     </qresource>
 </RCC>
