@@ -1,10 +1,8 @@
 <RCC>
     <qresource prefix="/">
         <file>www/index.html</file>
-        <file>www/index.css</file>
-        <file>www/index.js</file>
-        <file>www/page1.htm</file>
-        <file>www/page2.htm</file>
-        <file>www/page3.htm</file>
+        <file>www/app.js</file>
+        <file>www/version.htm</file>
+        <file>www/testConnection.htm</file>
     </qresource>
 </RCC>

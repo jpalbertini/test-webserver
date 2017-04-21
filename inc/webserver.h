@@ -16,7 +16,9 @@ class WebServer : public QObject, public CivetHandler
 public:
     explicit WebServer(QObject *parent = 0);
     void setBasePath(const QString& path);
-    void registerDataService(const QString& serviceKey, ServiceCallback callback);
+
+    void addConstant(const QString& constantName, const QString& value);
+    void addDataService(const QString& serviceKey, ServiceCallback callback);
 
     // CivetHandler interface
 public:
@@ -33,6 +35,7 @@ protected:
     QString basePath = ":/www";
     QVariantMap cache;
     QMap<QString, ServiceCallback> services;
+    QMap<QString, QString> constants;
 };
 
 #endif // WEBSERVER_H

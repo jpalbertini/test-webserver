@@ -9,22 +9,28 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.1/angular-material.js"></script>
     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.1/angular-material.css">
-    
-    <script src="index.js"></script>
-    <link rel="stylesheet" href="index.css">
+
+    <script src="app.js"></script>
 </head>
 
 <body ng-cloak>
+    <md-toolbar class="md-primary">
+        <div class="md-toolbar-tools">
+            <h2> DASServer Management Tools </h2>
+        </div>
+    </md-toolbar>
     <md-tabs>
-        <md-tab label="page1">
-            <div ng-include="'page1.htm'"></div>
+        <md-tab label="Version">
+            <md-content class="md-padding">
+                <div ng-include="'version.htm'"></div>
+            </md-content>
         </md-tab>
-        <md-tab label="page2">
-            <div ng-include="'page2.htm'"></div>
-        </md-tab>
-        <md-tab label="page3">
-            <div ng-include="'page3.htm'"></div>
+        <md-tab label="Test Connection">
+            <md-content class="md-padding">
+                <div ng-include="'testConnection.htm'"></div>
+            </md-content>
         </md-tab>
     </md-tabs>
 </body>
+
 </html>

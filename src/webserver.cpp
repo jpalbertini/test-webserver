@@ -20,6 +20,11 @@ void WebServer::setBasePath(const QString &path)
     basePath = path;
 }
 
+void WebServer::addConstant(const QString &constantName, const QString &value)
+{
+    constants[QString("$%0").arg(constantName)] = value;
+}
+
 bool WebServer::handleGet(CivetServer *, mg_connection *conn)
 {
     const struct mg_request_info *req_info = mg_get_request_info(conn);
@@ -62,12 +67,14 @@ bool WebServer::handleGet(CivetServer *, mg_connection *conn)
         cache[requestUri] = content;
     }
 
-    QString file = cache[requestUri].toString();
+    QString fileContent = cache[requestUri].toString();
+    for(const auto& constant : constants.keys())
+        fileContent.replace(constant, constants[constant]);
 
     qDebug() << "served " << requestUri;
 
     mg_printf(conn, "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nConnection: close\r\n\r\n");
-    mg_printf(conn, file.toStdString().c_str());
+    mg_printf(conn, fileContent.toStdString().c_str());
     mg_printf(conn, "\r\n");
 
     return true;
@@ -109,7 +116,7 @@ bool WebServer::handlePatch(CivetServer *, mg_connection *)
     return false;
 }
 
-void WebServer::registerDataService(const QString& serviceKey, ServiceCallback callback)
+void WebServer::addDataService(const QString& serviceKey, ServiceCallback callback)
 {
     services[serviceKey] = callback;
 }
