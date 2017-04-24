@@ -3,6 +3,8 @@
         <file>www/index.html</file>
         <file>www/app.js</file>
         <file>www/version.htm</file>
+        <file>www/versionController.js</file>
         <file>www/testConnection.htm</file>
+        <file>www/testConnectionController.js</file>
     </qresource>
 </RCC>
