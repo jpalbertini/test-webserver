@@ -9,6 +9,8 @@
 #include "webserver.h"
 #include "ressourceaccess.h"
 
+#define WS_PORT 5000
+
 bool tryConnection(const QString& url)
 {
     QWebSocket wSocket;
@@ -31,8 +33,21 @@ int main(int argc, char *argv[])
     WebServer wServer(&app);
     RessourceAccess rAccess(&app);
     QWebSocketServer wsServer("TestServer", QWebSocketServer::NonSecureMode, &app);
-    qDebug() << "Listen: " << wsServer.listen(QHostAddress::Any, 5000);
 
+    QObject::connect(&wsServer, &QWebSocketServer::newConnection, [&](){
+       while(wsServer.hasPendingConnections())
+       {
+           QWebSocket* pWebSocket = wsServer.nextPendingConnection();
+           QObject::connect(pWebSocket, &QWebSocket::textMessageReceived, [&](const QString& message) {
+               pWebSocket->sendTextMessage(message);
+           });
+           QObject::connect(pWebSocket, &QWebSocket::disconnected, [&]() {
+               qDebug() << "disconnected...";
+           });
+       }
+    });
+
+    qDebug() << "Listen: " << wsServer.listen(QHostAddress::Any, WS_PORT);
 
     wServer.addDataService("data", [&]() {
         return rAccess.getData();
@@ -46,9 +61,8 @@ int main(int argc, char *argv[])
         };
     });
     wServer.addConstant("HOST", QHostInfo::localHostName());
-    wServer.addConstant("PORT", "5000");
+    wServer.addConstant("PORT", QString("%0").arg(WS_PORT));
     wServer.addDataService("testAliveConnection", [&]() {
-
         QFuture<bool> futur = QtConcurrent::run(&tryConnection, QString("ws://localhost:5000"));
         futur.waitForFinished();
 

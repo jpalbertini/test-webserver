@@ -2,11 +2,11 @@ app.controller('TestConnectionController', ['$scope', '$http', function ($scope,
 
     $scope.statusAlive = "help";
     $scope.errorTextAlive = "";
-    
+
     $scope.statusReal = "help";
     $scope.errorTextReal = "";
 
-    $scope.testAliveConnection = function() {
+    $scope.testAliveConnection = function () {
         $scope.errorTextAlive = "";
         $scope.statusAlive = "refresh";
 
@@ -19,22 +19,26 @@ app.controller('TestConnectionController', ['$scope', '$http', function ($scope,
             $scope.statusAlive = "error";
             $scope.errorTextAlive = response.statusText;
         });
-    }
-
-    $scope.testRealConnection = function() {
+    };
+        
+    var webSocket = new WebSocket("ws://$HOST:$PORT");
+    $scope.testRealConnection = function () {
         $scope.errorTextReal = "";
         $scope.statusReal = "refresh";
-
-        var webSocket = new WebSocket("ws://$HOST:$PORT");
-        webSocket.onopen = function(e) {
-            $scope.statusReal = "check";
-            $scope.errorTextReal = "";
-            webSocket.close();
+    
+        webSocket.onopen = function (e) {
+            console.log("open");
         };
-        webSocket.onerror = function(e) {
+        webSocket.onerror = function (e) {
             $scope.statusReal = "error";
             $scope.errorTextReal = e;
+            console.log("error");
         };
-    }
-
+        webSocket.onmessage = function (event) {
+            $scope.statusReal = "check";
+            $scope.errorTextReal = "";
+            console.log("message");
+        };
+        webSocket.send("{ \"verb\" : \"version\"}");
+    };
 }]);
