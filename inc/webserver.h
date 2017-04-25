@@ -17,6 +17,9 @@ public:
     explicit WebServer(QObject *parent = 0);
     void setBasePath(const QString& path);
 
+    void start(quint16 port);
+    void stop();
+
     void addConstant(const QString& constantName, const QString& value);
     void addDataService(const QString& serviceKey, ServiceCallback callback);
 

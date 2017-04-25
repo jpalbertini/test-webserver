@@ -71,5 +71,7 @@ int main(int argc, char *argv[])
         };
     });
 
+    wServer.start(8080);
+
     return app.exec();
 }

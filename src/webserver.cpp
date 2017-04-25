@@ -11,13 +11,27 @@ WebServer::WebServer(QObject *parent)
 {
     std::vector<std::string> cpp_options = { "listening_ports", "8080"};
     server.reset(new CivetServer(cpp_options));
-
     server->addHandler("", *this);
 }
 
 void WebServer::setBasePath(const QString &path)
 {
     basePath = path;
+}
+
+void WebServer::start(quint16 port)
+{
+    if(server)
+        server->close();
+
+    std::vector<std::string> cpp_options = { "listening_ports", QString::number(port).toStdString()};
+    server.reset(new CivetServer(cpp_options));
+    server->addHandler("", *this);
+}
+
+void WebServer::stop()
+{
+    server->close();
 }
 
 void WebServer::addConstant(const QString &constantName, const QString &value)
