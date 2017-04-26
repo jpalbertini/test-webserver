@@ -26,6 +26,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 win32 {
     LIBS += -lws2_32 -lComdlg32 -lUser32 -lShell32 -lAdvapi32
+} else {
+    LIBS += -ldl
 }
 
 RESOURCES += \
