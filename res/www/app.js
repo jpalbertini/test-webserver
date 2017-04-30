@@ -1,1 +1,1 @@
-app = angular.module('MgmtApp', ['ngMaterial']);
+app = angular.module('MgmtApp', ['ngMaterial', 'ngRoute']);

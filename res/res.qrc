@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>www/index.html</file>
+        <file>www/authController.js</file>
         <file>www/app.js</file>
         <file>www/mainpage.htm</file>
         <file>www/versionController.js</file>

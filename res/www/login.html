@@ -4,7 +4,6 @@
 <head>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=RobotoDraft:300,400,500,700,400italic">
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular-route.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular-animate.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular-aria.js"></script>
 
@@ -14,26 +13,15 @@
 
     <script src="app.js"></script>
     <script src="authController.js"></script>
-    <script src="versionController.js"></script>
-    <script src="testConnectionController.js"></script>
-    <script type="text/javascript">
-        window.user = {{ user | safe }};
-    </script>
+    </script
 </head>
 
 <body ng-cloak>
-    <md-toolbar class="md-primary">
-        <div class="md-toolbar-tools">
-            <h2> DASServer Management Tools {{ user|safe}}</h2>
+    <div layout="row">
+        <div ayout="column">
+            <p> {{ user }}
         </div>
-    </md-toolbar>
-    <md-tabs md-dynamic-height>
-        <md-tab label="Main">
-            <md-content class="md-padding">
-                <div ng-include="'mainpage.htm'"></div>
-            </md-content>
-        </md-tab>
-    </md-tabs>
+    </div>
 </body>
 
 </html>

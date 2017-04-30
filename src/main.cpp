@@ -31,6 +31,7 @@ int main(int argc, char *argv[])
     QCoreApplication app(argc, argv);
 
     WebServer wServer(&app);
+    wServer.setBasePath("D:/dev/test-webserver/res/www");
     RessourceAccess rAccess(&app);
     QWebSocketServer wsServer("TestServer", QWebSocketServer::NonSecureMode, &app);
 
