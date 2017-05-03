@@ -5,6 +5,14 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
+void reply(mg_connection * conn, const QVariantMap& response)
+{
+    QJsonDocument doc = QJsonDocument(QJsonObject::fromVariantMap(response));
+    mg_printf(conn, "HTTP/1.1 200 OK\r\nContent-Type: application/jsonl\r\nConnection: close\r\n\r\n");
+    mg_printf(conn, doc.toJson().data());
+    mg_printf(conn, "\r\n");
+}
+
 WebServer::WebServer(QObject *parent)
     : QObject(parent)
     , CivetHandler()
@@ -42,22 +50,14 @@ void WebServer::addConstant(const QString &constantName, const QString &value)
 bool WebServer::handleGet(CivetServer *, mg_connection *conn)
 {
     const struct mg_request_info *req_info = mg_get_request_info(conn);
-
-    qDebug()  << req_info->request_uri;
-
     QString requestUri = QString::fromLocal8Bit(req_info->request_uri);
     requestUri.remove(0, 1);
 
-    if(services.contains(requestUri))
+    if(getDataServices.contains(requestUri))
     {
-        auto data = services[requestUri]();
-        QJsonDocument doc = QJsonDocument(QJsonObject::fromVariantMap(data));
-        mg_printf(conn, "HTTP/1.1 200 OK\r\nContent-Type: application/jsonl\r\nConnection: close\r\n\r\n");
-        mg_printf(conn, doc.toJson().data());
-        mg_printf(conn, "\r\n");
-
-        qDebug() << "served service data " << requestUri;
-
+        auto data = getDataServices[requestUri]();
+        reply(conn, data);
+        qDebug() << "served get service data " << requestUri;
         return true;
     }
 
@@ -99,13 +99,29 @@ bool WebServer::handlePost(CivetServer*, mg_connection * conn)
 {
     const struct mg_request_info *req_info = mg_get_request_info(conn);
 
-    long long dataSize = req_info->content_length;
-    char buf[dataSize + 1] = "";
+    QString requestUri = QString::fromLocal8Bit(req_info->request_uri);
+    requestUri.remove(0, 1);
 
-    mg_read(conn, buf, (size_t)dataSize);
-    QString data = QString::fromLocal8Bit(buf);
+    if(postDataServices.contains(requestUri))
+    {
+        long long dataSize = req_info->content_length;
+        char buf[dataSize];
+        buf[dataSize] = '\0';
 
-    qDebug() << "post not supported: " << data << " : ";
+        mg_read(conn, buf, (size_t)dataSize);
+        QByteArray rawData(buf, dataSize);
+        QJsonDocument doc = QJsonDocument::fromJson(rawData);
+
+        auto data = postDataServices[requestUri](doc.object().toVariantMap());
+        reply(conn, data);
+        qDebug() << "served post service data " << requestUri;
+
+        qDebug() << "post not supported: " << doc.object().toVariantMap() << " : ";
+
+        return true;
+    }
+
+    qDebug() << "Post not supported: " << requestUri;
     return false;
 }
 
@@ -139,7 +155,12 @@ bool WebServer::handlePatch(CivetServer *, mg_connection *)
     return false;
 }
 
-void WebServer::addDataService(const QString& serviceKey, ServiceCallback callback)
+void WebServer::addGetDataService(const QString& serviceKey, GetDataCallback callback)
 {
-    services[serviceKey] = callback;
+    getDataServices[serviceKey] = callback;
+}
+
+void WebServer::addPostDataService(const QString &serviceKey, PostDataCallback callback)
+{
+    postDataServices[serviceKey] = callback;
 }

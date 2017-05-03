@@ -8,7 +8,8 @@
 
 #include "CivetServer.h"
 
-using ServiceCallback = std::function<QVariantMap()>;
+using GetDataCallback = std::function<QVariantMap()>;
+using PostDataCallback = std::function<QVariantMap(QVariantMap)>;
 
 class WebServer : public QObject, public CivetHandler
 {
@@ -21,7 +22,8 @@ public:
     void stop();
 
     void addConstant(const QString& constantName, const QString& value);
-    void addDataService(const QString& serviceKey, ServiceCallback callback);
+    void addGetDataService(const QString& serviceKey, GetDataCallback callback);
+    void addPostDataService(const QString& serviceKey, PostDataCallback callback);
 
     // CivetHandler interface
 public:
@@ -37,7 +39,8 @@ protected:
     std::unique_ptr<CivetServer> server;
     QString basePath = ":/www";
     QVariantMap cache;
-    QMap<QString, ServiceCallback> services;
+    QMap<QString, GetDataCallback> getDataServices;
+    QMap<QString, PostDataCallback> postDataServices;
     QMap<QString, QString> constants;
 };
 

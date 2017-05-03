@@ -50,10 +50,10 @@ int main(int argc, char *argv[])
 
     qDebug() << "Listen: " << wsServer.listen(QHostAddress::Any, WS_PORT);
 
-    wServer.addDataService("data", [&]() {
+    wServer.addGetDataService("data", [&]() {
         return rAccess.getData();
     });
-    wServer.addDataService("version", [&]() {
+    wServer.addGetDataService("version", [&]() {
         return QVariantMap{
             { "version", "1.2.3"},
             { "ver", "1.2.3.4.5"},
@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
     });
     wServer.addConstant("HOST", QHostInfo::localHostName());
     wServer.addConstant("PORT", QString("%0").arg(WS_PORT));
-    wServer.addDataService("testAliveConnection", [&]() {
+    wServer.addGetDataService("testAliveConnection", [&]() {
         QFuture<bool> futur = QtConcurrent::run(&tryConnection, QString("ws://localhost:5000"));
         futur.waitForFinished();
 

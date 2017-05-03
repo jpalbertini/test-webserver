@@ -1,21 +1,22 @@
-<md-card>
-    <md-card-title>
-        <md-card-title-text>
-            <span class="md-headline">Login</span>
-        </md-card-title-text>
-    </md-card-title>
-    <md-card-content>
-        <div layout="column">
-            <md-input-container>
-                <label>Username</label>
-                <input ng-model="tempUser">
-                <div ng-messages="inError" multiple md-auto-hide="false">
-                    <div ng-message="required">
-                        {{ lastError }}
-                    </div>
+<div flex layout="column" layout-align="center center" class="text-center">
+    <md-card>
+        <md-card-title>
+            <md-card-title-text>
+                <span class="md-headline" layout="row" layout-align="center center">Login</span>
+            </md-card-title-text>
+        </md-card-title>
+        <md-card-content>
+            <div layout="row" layout-align="center start">
+                <md-input-container class="md-block">
+                    <label style="text-align:center">Username</label>
+                    <input required ng-model="tempUser">
+                </md-input-container>
+            </div>
+            <div layout="row" layout-align="center center">
+                <div class="md-block">
+                    <md-button class="md-raised md-primary" ng-click="submitLogin(tempUser)">Log In</md-button>
                 </div>
-            </md-input-container>
-            <md-button class="md-raised md-primary" ng-click="submitLogin()">Log In</md-button>
-        </div>
-    </md-card-content>
-</md-card>
+            </div>
+        </md-card-content>
+    </md-card>
+</div>
