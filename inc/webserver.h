@@ -9,7 +9,7 @@
 #include "CivetServer.h"
 
 using GetDataCallback = std::function<QVariantMap()>;
-using PostDataCallback = std::function<QVariantMap(QVariantMap)>;
+using PostDataCallback = std::function<QVariantMap(QString, QVariantMap)>;
 
 class WebServer : public QObject, public CivetHandler
 {

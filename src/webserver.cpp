@@ -108,11 +108,14 @@ bool WebServer::handlePost(CivetServer*, mg_connection * conn)
         char buf[dataSize];
         buf[dataSize] = '\0';
 
+        std::string user;
+        getCookie(conn,"user", user);
+
         mg_read(conn, buf, (size_t)dataSize);
         QByteArray rawData(buf, dataSize);
         QJsonDocument doc = QJsonDocument::fromJson(rawData);
 
-        auto data = postDataServices[requestUri](doc.object().toVariantMap());
+        auto data = postDataServices[requestUri](user, doc.object().toVariantMap());
         reply(conn, data);
         qDebug() << "served post service data " << requestUri;
 
