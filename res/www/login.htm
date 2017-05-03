@@ -1,0 +1,21 @@
+<md-card>
+    <md-card-title>
+        <md-card-title-text>
+            <span class="md-headline">Login</span>
+        </md-card-title-text>
+    </md-card-title>
+    <md-card-content>
+        <div layout="column">
+            <md-input-container>
+                <label>Username</label>
+                <input ng-model="tempUser">
+                <div ng-messages="inError" multiple md-auto-hide="false">
+                    <div ng-message="required">
+                        {{ lastError }}
+                    </div>
+                </div>
+            </md-input-container>
+            <md-button class="md-raised md-primary" ng-click="submitLogin()">Log In</md-button>
+        </div>
+    </md-card-content>
+</md-card>

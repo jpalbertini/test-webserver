@@ -65,8 +65,9 @@ bool WebServer::handleGet(CivetServer *, mg_connection *conn)
         requestUri = "index.html";
     requestUri = basePath + "/" + requestUri;
 
-
+#if !defined QT_DEBUG
     if(!cache.contains(requestUri) || cache[requestUri].toString().isEmpty())
+#endif
     {
         QString content;
         QFile mainF(requestUri);
@@ -94,9 +95,17 @@ bool WebServer::handleGet(CivetServer *, mg_connection *conn)
     return true;
 }
 
-bool WebServer::handlePost(CivetServer*, mg_connection *)
+bool WebServer::handlePost(CivetServer*, mg_connection * conn)
 {
-    qDebug() << "post not supported";
+    const struct mg_request_info *req_info = mg_get_request_info(conn);
+
+    long long dataSize = req_info->content_length;
+    char buf[dataSize + 1] = "";
+
+    mg_read(conn, buf, (size_t)dataSize);
+    QString data = QString::fromLocal8Bit(buf);
+
+    qDebug() << "post not supported: " << data << " : ";
     return false;
 }
 

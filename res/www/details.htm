@@ -1,0 +1,67 @@
+<div layout="column">
+  <div layout="row">
+    <md-card>
+      <md-card-title>
+        <md-card-title-text>
+          <span class="md-headline">Connected User</span>
+        </md-card-title-text>
+      </md-card-title>
+      <md-card-content>
+          <table>
+            <tr>
+              <td><p>Username: </p></td>
+              <td><p>{{ currentUser | safeUser }}</p></td>
+            </tr>
+          </table>
+      </md-card-content>
+    </md-card>
+    <div ng-controller="VersionController">
+      <md-card>
+        <md-card-title>
+          <md-card-title-text>
+            <span class="md-headline">Version</span>
+          </md-card-title-text>
+        </md-card-title>
+        <md-card-content>
+          <table>
+            <tr ng-repeat="(key, value) in versionInformations">
+              <td>{{ key }}</td>
+              <td>{{ value }}</td>
+            </tr>
+          </table>
+        </md-card-content>
+      </md-card>
+    </div>
+    <div ng-controller="TestConnectionController">
+      <md-card>
+        <md-card-title>
+          <md-card-title-text>
+            <span class="md-headline">Connectivity</span>
+          </md-card-title-text>
+        </md-card-title>
+        <md-card-content>
+          <table>
+            <tr>
+              <td>
+                <p>Running</p>
+              </td>
+              <td><i class="material-icons md-36"> {{ statusAlive }} </i></td>
+              <td>
+                <p> {{ errorTextAlive }} </p>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <p>Connectivity</p>
+              </td>
+              <td><i class="material-icons md-36"> {{ statusReal }} </i></td>
+              <td>
+                <p> {{ errorTextReal }}</p>
+              </td>
+            </tr>
+          </table>
+        </md-card-content>
+      </md-card>
+    </div>
+  </div>
+</div>
