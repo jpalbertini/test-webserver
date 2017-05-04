@@ -6,5 +6,7 @@
         <file>www/mainpage.htm</file>
         <file>www/versionController.js</file>
         <file>www/testConnectionController.js</file>
+        <file>www/details.htm</file>
+        <file>www/login.htm</file>
     </qresource>
 </RCC>

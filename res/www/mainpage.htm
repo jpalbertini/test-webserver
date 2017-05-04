@@ -2,11 +2,18 @@
     <div class="md-toolbar-tools">
         <h2>DASServer Management Tools</h2>
         <span flex></span>
-        <h2 class="material-icons">account circle</h2>
-        <h2>{{currentUser}}</h2>
-        <md-button class="md-fab md-mini material-icons" ng-click="disconnectUser()">
-            <md-icon>eject</md-icon>
-        </md-button>
+        <h2> Welcome {{ currentUser }} </h2>
+        <md-menu md-offset="0 50">
+            <md-button class="md-icon-button material-icons" ng-click="$mdMenu.open($event)">
+                <md-icon md-menu-align-target>account_circle</md-icon>
+            </md-button>
+            <md-menu-content width=4>
+                <md-menu-item>
+                    <md-button class="md-raised" ng-click="disconnectUser()" >Disconnect</md-button>
+                </md-menu-item>
+            </md-menu-content>
+        </md-menu>
+
     </div>
 </md-toolbar>
 <md-tabs md-dynamic-height>

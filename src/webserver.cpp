@@ -118,10 +118,7 @@ bool WebServer::handlePost(CivetServer*, mg_connection * conn)
         auto sentData = doc.object().toVariantMap();
         auto data = postDataServices[requestUri](QString::fromStdString(user), sentData);
         reply(conn, data);
-        qDebug() << "served post service data " << requestUri;
-
-        qDebug() << "post not supported: " << doc.object().toVariantMap() << " : ";
-
+        qDebug() << "served post service data " << requestUri << doc.object().toVariantMap();
         return true;
     }
 

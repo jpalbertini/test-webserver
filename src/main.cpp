@@ -10,17 +10,29 @@
 #include "ressourceaccess.h"
 
 #define WS_PORT 5000
+#define COOKIE_USERNAME "user"
 
 bool tryConnection(const QString& url)
 {
+    static int cpt = 0;
+
     QWebSocket wSocket;
     wSocket.open(QUrl(url));
     do
     {
-        QThread::currentThread()->eventDispatcher()->processEvents(QEventLoop::AllEvents);
+        QThread* pThread = QThread::currentThread();
+        if(pThread)
+        {
+            QAbstractEventDispatcher* dispatcher = pThread->eventDispatcher();
+            if(dispatcher)
+                dispatcher->processEvents(QEventLoop::AllEvents);
+            else cpt++;
+        }
         QThread::msleep(100);
         qDebug() << "waiting";
-    }while(wSocket.state() == QAbstractSocket::ConnectingState);
+    }while(wSocket.state() == QAbstractSocket::ConnectingState && cpt < 10);
+
+    cpt = 0;
 
     return wSocket.state() == QAbstractSocket::ConnectedState;
 }
@@ -35,18 +47,18 @@ int main(int argc, char *argv[])
     RessourceAccess rAccess(&app);
     QWebSocketServer wsServer("TestServer", QWebSocketServer::NonSecureMode, &app);
 
-    QObject::connect(&wsServer, &QWebSocketServer::newConnection, [&](){
-       while(wsServer.hasPendingConnections())
-       {
-           QWebSocket* pWebSocket = wsServer.nextPendingConnection();
-           QObject::connect(pWebSocket, &QWebSocket::textMessageReceived, [&](const QString& message) {
-               pWebSocket->sendTextMessage(message);
-           });
-           QObject::connect(pWebSocket, &QWebSocket::disconnected, [&]() {
-               qDebug() << "disconnected...";
-           });
-       }
-    });
+//    QObject::connect(&wsServer, &QWebSocketServer::newConnection, [&](){
+//       while(wsServer.hasPendingConnections())
+//       {
+//           QWebSocket* pWebSocket = wsServer.nextPendingConnection();
+//           QObject::connect(pWebSocket, &QWebSocket::textMessageReceived, [&](const QString& message) {
+//               pWebSocket->sendTextMessage(message);
+//           });
+//           QObject::connect(pWebSocket, &QWebSocket::disconnected, [&]() {
+//               qDebug() << "disconnected...";
+//           });
+//       }
+//    });
 
     qDebug() << "Listen: " << wsServer.listen(QHostAddress::Any, WS_PORT);
 
@@ -70,6 +82,7 @@ int main(int argc, char *argv[])
     });
     wServer.addConstant("HOST", QHostInfo::localHostName());
     wServer.addConstant("PORT", QString("%0").arg(WS_PORT));
+    wServer.addConstant("COOKIE_USERNAME", COOKIE_USERNAME);
     wServer.addGetDataService("testAliveConnection", [&]() {
         QFuture<bool> futur = QtConcurrent::run(&tryConnection, QString("ws://localhost:5000"));
         futur.waitForFinished();

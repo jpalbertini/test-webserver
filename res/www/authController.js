@@ -1,6 +1,6 @@
 app.controller('AuthController', ['$scope', '$http', '$cookies', '$mdToast',
     function ($scope, $http, $cookies, $mdToast) {
-        $scope.currentUser = $cookies.get('user') || null;
+        $scope.currentUser = $cookies.get('$COOKIE_USERNAME') || null;
 
         $scope.getCurrentView = function () {
             if ($scope.currentUser)
@@ -15,7 +15,7 @@ app.controller('AuthController', ['$scope', '$http', '$cookies', '$mdToast',
             }).then(function successCallback(response) {
                 if (response.data["valid"]) {
                     $scope.currentUser = user;
-                    $cookies.put('user', user);
+                    $cookies.put('$COOKIE_USERNAME', user);
                 }
                 else {
                     $mdToast.show(
@@ -34,7 +34,7 @@ app.controller('AuthController', ['$scope', '$http', '$cookies', '$mdToast',
         };
         $scope.disconnectUser = function () {
             $scope.currentUser = null;
-            $cookies.remove('user');
+            $cookies.remove('$COOKIE_USERNAME');
         };
     }
 ]);
