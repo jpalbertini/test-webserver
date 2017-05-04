@@ -1,9 +1,6 @@
 app.controller('TestConnectionController', ['$scope', '$http', function ($scope, $http) {
 
     $scope.statusReal = "help";
-    $scope.errorTextReal = "";
-
-    $scope.errorTextAlive = "";
     $scope.statusAlive = "refresh";
 
     $scope.checkAliveConnection = function () {
@@ -16,7 +13,6 @@ app.controller('TestConnectionController', ['$scope', '$http', function ($scope,
             $scope.statusAlive = response.data["status"];
         }, function errorCallback(response) {
             $scope.statusAlive = "error";
-            $scope.errorTextAlive = response.statusText;
         });
     };
 
@@ -27,14 +23,10 @@ app.controller('TestConnectionController', ['$scope', '$http', function ($scope,
         $scope.errorTextReal = "";
 
         webSocket.onopen = function (e) {
-            console.log("open");
             $scope.statusReal = "check";
-            $scope.errorTextReal = "";
         };
         webSocket.onerror = function (e) {
-            console.log("error", e);
             $scope.statusReal = "error";
-            $scope.errorTextAlive = response.statusText;
         };
     };
 
