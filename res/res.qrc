@@ -8,5 +8,7 @@
         <file>www/testConnectionController.js</file>
         <file>www/details.htm</file>
         <file>www/login.htm</file>
+        <file>www/downloadContent.htm</file>
+        <file>www/downloadContentController.js</file>
     </qresource>
 </RCC>

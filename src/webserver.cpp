@@ -50,14 +50,29 @@ void WebServer::addConstant(const QString &constantName, const QString &value)
 bool WebServer::handleGet(CivetServer *, mg_connection *conn)
 {
     const struct mg_request_info *req_info = mg_get_request_info(conn);
+
+    std::string user;
+    CivetServer::getCookie(conn, "user", user);
+
     QString requestUri = QString::fromLocal8Bit(req_info->request_uri);
     requestUri.remove(0, 1);
 
+    GetParameters parameters;
+    QStringList params = QString::fromLocal8Bit(req_info->query_string).split("&");
+    for(const auto& param : params)
+    {
+        auto paramKeyValue = param.split("=");
+        if(paramKeyValue.count() == 1)
+            parameters[paramKeyValue[0]] = "";
+        else
+            parameters[paramKeyValue[0]] = paramKeyValue[1];
+    }
+
     if(getDataServices.contains(requestUri))
     {
-        auto data = getDataServices[requestUri]();
+        auto data = getDataServices[requestUri](QString::fromStdString(user), parameters);
         reply(conn, data);
-        qDebug() << "served get service data " << requestUri;
+        qDebug() << "served get service data " << requestUri << parameters;
         return true;
     }
 
@@ -98,6 +113,8 @@ bool WebServer::handleGet(CivetServer *, mg_connection *conn)
 bool WebServer::handlePost(CivetServer*, mg_connection * conn)
 {
     const struct mg_request_info *req_info = mg_get_request_info(conn);
+    std::string user;
+    CivetServer::getCookie(conn,"user", user);
 
     QString requestUri = QString::fromLocal8Bit(req_info->request_uri);
     requestUri.remove(0, 1);
@@ -107,9 +124,6 @@ bool WebServer::handlePost(CivetServer*, mg_connection * conn)
         long long dataSize = req_info->content_length;
         char buf[dataSize];
         buf[dataSize] = '\0';
-
-        std::string user;
-        CivetServer::getCookie(conn,"user", user);
 
         mg_read(conn, buf, (size_t)dataSize);
         QByteArray rawData(buf, dataSize);
