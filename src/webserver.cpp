@@ -8,7 +8,7 @@
 void reply(mg_connection * conn, const QVariantMap& response)
 {
     QJsonDocument doc = QJsonDocument(QJsonObject::fromVariantMap(response));
-    mg_printf(conn, "HTTP/1.1 200 OK\r\nContent-Type: application/jsonl\r\nConnection: close\r\n\r\n");
+    mg_printf(conn, "HTTP/1.1 200 OK\r\nContent-Type: application/jsonl\r\n\r\n");
     mg_printf(conn, doc.toJson().data());
     mg_printf(conn, "\r\n");
 }
@@ -88,7 +88,7 @@ bool WebServer::handleGet(CivetServer *, mg_connection *conn)
 
     qDebug() << "served " << requestUri;
 
-    mg_printf(conn, "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nConnection: close\r\n\r\n");
+    mg_printf(conn, "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n");
     mg_printf(conn, fileContent.toStdString().c_str());
     mg_printf(conn, "\r\n");
 
@@ -109,13 +109,14 @@ bool WebServer::handlePost(CivetServer*, mg_connection * conn)
         buf[dataSize] = '\0';
 
         std::string user;
-        getCookie(conn,"user", user);
+        CivetServer::getCookie(conn,"user", user);
 
         mg_read(conn, buf, (size_t)dataSize);
         QByteArray rawData(buf, dataSize);
         QJsonDocument doc = QJsonDocument::fromJson(rawData);
 
-        auto data = postDataServices[requestUri](user, doc.object().toVariantMap());
+        auto sentData = doc.object().toVariantMap();
+        auto data = postDataServices[requestUri](QString::fromStdString(user), sentData);
         reply(conn, data);
         qDebug() << "served post service data " << requestUri;
 

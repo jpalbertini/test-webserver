@@ -1,6 +1,12 @@
 <md-toolbar class="md-primary">
     <div class="md-toolbar-tools">
-        <h2> DASServer Management Tools</h2>
+        <h2>DASServer Management Tools</h2>
+        <span flex></span>
+        <h2 class="material-icons">account circle</h2>
+        <h2>{{currentUser}}</h2>
+        <md-button class="md-fab md-mini material-icons" ng-click="disconnectUser()">
+            <md-icon>eject</md-icon>
+        </md-button>
     </div>
 </md-toolbar>
 <md-tabs md-dynamic-height>

@@ -61,6 +61,13 @@ int main(int argc, char *argv[])
             { "version_lon_long", "1.2.3.4.5"}
         };
     });
+
+    wServer.addPostDataService("login", [&](QString user, QVariantMap data) {
+        qDebug() << "post tryed " << user << data;
+        return QVariantMap{
+            { "valid", true}
+        };
+    });
     wServer.addConstant("HOST", QHostInfo::localHostName());
     wServer.addConstant("PORT", QString("%0").arg(WS_PORT));
     wServer.addGetDataService("testAliveConnection", [&]() {
