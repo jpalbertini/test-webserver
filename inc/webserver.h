@@ -18,6 +18,7 @@ class WebServer : public QObject, public CivetHandler
 public:
     explicit WebServer(QObject *parent = 0);
     void setBasePath(const QString& path);
+    void setBasePage(const QString& page);
 
     void start(quint16 port);
     void stop();
@@ -25,6 +26,8 @@ public:
     void addConstant(const QString& constantName, const QString& value);
     void addGetDataService(const QString& serviceKey, GetDataCallback callback);
     void addPostDataService(const QString& serviceKey, PostDataCallback callback);
+
+    static QString mimeTypeForFile(const QString &filePath);
 
     // CivetHandler interface
 public:
@@ -38,7 +41,8 @@ public:
 
 protected:
     std::unique_ptr<CivetServer> server;
-    QString basePath = ":/www";
+    QString basePath = ":/";
+    QString basePage = "index.html";
     QVariantMap cache;
     QMap<QString, GetDataCallback> getDataServices;
     QMap<QString, PostDataCallback> postDataServices;

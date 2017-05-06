@@ -1,24 +1,22 @@
-<div flex layout="column" layout-align="center center" class="text-center">
-    <md-card>
-        <md-card-title>
-            <md-card-title-text>
-                <span class="md-headline" layout="row" layout-align="center center">Login</span>
-            </md-card-title-text>
-        </md-card-title>
-        <md-card-content>
-            <form>
-                <div layout="row" layout-align="center start">
-                    <md-input-container class="md-block">
-                        <label style="text-align:center">Username</label>
-                        <input required ng-model="tempUser">
-                    </md-input-container>
-                </div>
-                <div layout="row" layout-align="center center">
-                    <div class="md-block">
+<div layout="column" layout-align="center center" flex>
+    <div layout="row" layout-align="center center" flex>
+        <md-card>
+            <md-card-title>
+                <md-card-title-text>
+                    <span class="md-headline" style="text-align:center" layout-align="center center">Login</span>
+                </md-card-title-text>
+            </md-card-title>
+            <md-card-content>
+                <form>
+                    <div layout="column" layout-align="center">
+                        <md-input-container flex>
+                            <label style="text-align:center">Username</label>
+                            <input required ng-model="tempUser">
+                        </md-input-container>
                         <md-button class="md-raised md-primary" type="submit" ng-click="submitLogin(tempUser)">Log In</md-button>
                     </div>
-                </div>
-            </form>
-        </md-card-content>
-    </md-card>
+                </form>
+            </md-card-content>
+        </md-card>
+    </div>
 </div>

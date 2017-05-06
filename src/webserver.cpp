@@ -1,7 +1,9 @@
 #include "webserver.h"
 
 #include <QDebug>
+#include <QDir>
 #include <QFile>
+#include <QMimeDatabase>
 #include <QJsonDocument>
 #include <QJsonObject>
 
@@ -76,18 +78,19 @@ bool WebServer::handleGet(CivetServer *, mg_connection *conn)
         return true;
     }
 
-    if(requestUri.isEmpty())
-        requestUri = "index.html";
-    requestUri = basePath + "/" + requestUri;
+    if(requestUri.isEmpty()) requestUri = basePage;
+
+    if(QDir::isRelativePath(requestUri))
+        requestUri = basePath + "/" + requestUri;
 
 #if !defined QT_DEBUG
     if(!cache.contains(requestUri) || cache[requestUri].toString().isEmpty())
 #endif
     {
-        QString content;
+        QByteArray content;
         QFile mainF(requestUri);
         if(mainF.open(QIODevice::ReadOnly))
-            content = QString::fromLatin1(mainF.readAll());
+            content = mainF.readAll();
         else
         {
             qWarning() << "cannot open file " << requestUri;
@@ -97,14 +100,17 @@ bool WebServer::handleGet(CivetServer *, mg_connection *conn)
         cache[requestUri] = content;
     }
 
-    QString fileContent = cache[requestUri].toString();
+
+    QByteArray fileContent = cache[requestUri].toByteArray();
     for(const auto& constant : constants.keys())
-        fileContent.replace(constant, constants[constant]);
+        fileContent.replace(constant, constants[constant].toUtf8());
 
-    qDebug() << "served " << requestUri;
+    qDebug() << "served " << requestUri << " : " << mimeTypeForFile(requestUri);
 
-    mg_printf(conn, "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n");
-    mg_printf(conn, fileContent.toStdString().c_str());
+    QString text = QString("HTTP/1.1 200 OK\r\nContent-Type: %0\r\n\r\n").arg(mimeTypeForFile(requestUri));
+
+    mg_printf(conn, text.toStdString().c_str());
+    mg_printf(conn, QString::fromUtf8(fileContent).toStdString().c_str());
     mg_printf(conn, "\r\n");
 
     return true;
@@ -178,4 +184,10 @@ void WebServer::addGetDataService(const QString& serviceKey, GetDataCallback cal
 void WebServer::addPostDataService(const QString &serviceKey, PostDataCallback callback)
 {
     postDataServices[serviceKey] = callback;
+}
+
+QString WebServer::mimeTypeForFile(const QString& filePath)
+{
+    static QMimeDatabase db;
+    return db.mimeTypeForFile(filePath).name();
 }
