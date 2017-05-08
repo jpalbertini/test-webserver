@@ -1,7 +1,10 @@
 <div ng-controller="StatisticsController">
-  <div layout="column">    
-    <div ng-repeat="(statistic, value) in statistics">
-      <p> {{ statistic }}  :  {{ value }}<p>
+  <div layout="row">
+    <div ng-repeat="(statistic, value) in statistics" flex>
+      <canvas class="chart chart-line" 
+            chart-data="statistics[statistic]"
+            chart-labels="statisticLabels"
+            chart-colors="statisticColors[statistic]"></canvas>
     </div>
   </div>
 </div>
