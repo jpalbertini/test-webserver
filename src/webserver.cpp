@@ -74,7 +74,7 @@ bool WebServer::handleGet(CivetServer *, mg_connection *conn)
     {
         auto data = getDataServices[requestUri](QString::fromStdString(user), parameters);
         reply(conn, data);
-        qDebug() << "served get service data " << requestUri << parameters;
+        qDebug() << "served get service data " << requestUri << parameters << data;
         return true;
     }
 

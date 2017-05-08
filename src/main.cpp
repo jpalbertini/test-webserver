@@ -42,7 +42,6 @@ bool tryConnection(const QString& url)
     return wSocket.state() == QAbstractSocket::ConnectedState;
 }
 
-
 int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
@@ -71,6 +70,15 @@ int main(int argc, char *argv[])
             { "version_lon_long", "1.2.3.4.5"}
         };
     });
+    wServer.addGetDataService("statistics", [&](const QString&, const GetParameters&) {
+        srand(QTime::currentTime().msec());
+        QVariantMap data;
+        data["A"] = rand() % 100;
+        data["B"] = rand() % 100;
+        data["C"] = rand() % 100;
+        data["D"] = rand() % 100;
+        return data;
+    });
 
     wServer.addGetDataService("GetDownloadableObjects", [&](const QString&, const GetParameters&) {
         auto list = QDir(":/www").entryList(QDir::NoDotAndDotDot | QDir::Files);
@@ -79,7 +87,7 @@ int main(int argc, char *argv[])
             { DOWNLOADABLE_LIST_KEY, list }
         };
     });
-    wServer.addGetDataService("GetDownloadableObject", [&](const QString&, const GetParameters& parameters) {
+            wServer.addGetDataService("GetDownloadableObject", [&](const QString&, const GetParameters& parameters) {
         QString path = QString(":/www/") + parameters[DOWNLOADABLE_OBJECT_KEY];
 
         QByteArray data;
@@ -97,17 +105,17 @@ int main(int argc, char *argv[])
 
         return QVariantMap{
             { "status", futur.result() ? "check" : "error"}
-        };
-    });
+            };
+            });
 
-    wServer.addPostDataService("login", [&](QString user, QVariantMap data) {
-        qDebug() << "post tryed " << user << data;
-        return QVariantMap{
-            { "valid", true}
-        };
-    });
+            wServer.addPostDataService("login", [&](QString user, QVariantMap data) {
+                qDebug() << "post tryed " << user << data;
+                return QVariantMap{
+                    { "valid", true}
+                };
+            });
 
-    wServer.start(8080);
+            wServer.start(8080);
 
-    return app.exec();
-}
+            return app.exec();
+        }
