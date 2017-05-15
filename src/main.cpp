@@ -77,6 +77,9 @@ int main(int argc, char *argv[])
         data["B"] = rand() % 100;
         data["C"] = rand() % 100;
         data["D"] = rand() % 100;
+        data["E"] = rand() % 100;
+        data["F"] = rand() % 100;
+        data["G"] = rand() % 100;
         return data;
     });
 

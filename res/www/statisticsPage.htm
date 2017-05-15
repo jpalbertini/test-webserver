@@ -1,10 +1,14 @@
 <div ng-controller="StatisticsController">
-  <div layout="row">
-    <div ng-repeat="(statistic, value) in statistics" flex>
-      <canvas class="chart chart-line" 
-            chart-data="statistics[statistic]"
-            chart-labels="statisticLabels"
-            chart-colors="statisticColors[statistic]"></canvas>
-    </div>
+  <div layout="row" layout-wrap>
+    <md-card style="width: 400px" ng-repeat="(statistic, value) in statistics">
+      <md-card-content>
+        <md-card-title>
+          <md-card-title-text>
+            <span class="md-headline" text-align="center">{{statistic}}</span>
+          </md-card-title-text>
+        </md-card-title>
+        <canvas class="chart chart-line" chart-data="statistics[statistic]" chart-labels="statisticLabels" chart-colors="statisticColors[statistic]"></canvas>
+      </md-card-content>
+    </md-card>
   </div>
 </div>

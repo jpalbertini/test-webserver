@@ -11,6 +11,7 @@ app.controller('StatisticsController', ['$scope', '$http', '$timeout', function 
         colorIndex = 0, //current color index
         allowedColors = ['#97BBCD', '#DCDCDC', '#F7464A', '#46BFBD', '#FDB45C', '#949FB1', '#4D5360']; //Allowed colors
 
+    $scope.zoom = 250;
 
     var retreiveStatistics = function () {
         $http({
