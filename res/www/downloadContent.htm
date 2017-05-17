@@ -7,8 +7,8 @@
 
 
   <div ui-tree id="tree-root" data-drag-enabled="false">
-    <ol ui-tree-nodes ng-model="data">
-      <li ng-repeat="node in data" ui-tree-node ng-include="'downloadContentItem.htm'">
+    <ol ui-tree-nodes ng-model="downloadables">
+      <li ng-repeat="node in downloadables" ui-tree-node ng-include="'downloadContentItem.htm'">
       </li>
     </ol>
   </div>

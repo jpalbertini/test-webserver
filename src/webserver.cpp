@@ -74,7 +74,7 @@ bool WebServer::handleGet(CivetServer *, mg_connection *conn)
     {
         auto data = getDataServices[requestUri](QString::fromStdString(user), parameters);
         reply(conn, data);
-        qDebug() << "served get service data " << requestUri << parameters << data;
+        qDebug() << "served get service data " << requestUri;
         return true;
     }
 
@@ -105,7 +105,7 @@ bool WebServer::handleGet(CivetServer *, mg_connection *conn)
     for(const auto& constant : constants.keys())
         fileContent.replace(constant, constants[constant].toUtf8());
 
-    qDebug() << "served " << requestUri << " : " << mimeTypeForFile(requestUri) << fileContent;
+    qDebug() << "served " << requestUri;
 
     QString text = QString("HTTP/1.1 200 OK\r\nContent-Type: %0\r\n\r\n").arg(mimeTypeForFile(requestUri));
 

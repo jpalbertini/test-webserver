@@ -1,10 +1,18 @@
 <div ui-tree-handle class="tree-node tree-node-content" style="cursor: default">
-  <a class="btn btn-success btn-xs" ng-if="node.nodes && node.nodes.length > 0" data-nodrag ng-click="toggle(this)"><span
-        class="glyphicon"
-        ng-class="{
-          'glyphicon-chevron-right': collapsed,
-          'glyphicon-chevron-down': !collapsed
-        }"></span></a>{{node.title}}
+  <div layout="row" layout-align="none center">
+    <a class="btn btn-success btn-xs" ng-if="node.nodes && node.nodes.length > 0" data-nodrag ng-click="toggle(this)">
+      <span class="glyphicon" ng-class="{ 'glyphicon-chevron-right': collapsed, 'glyphicon-chevron-down': !collapsed }"></span>
+    </a>
+    <span>{{node.title}}</span>
+    <span ng-show="!node.progressVisible" flex></span>
+    <md-progress-linear md-mode="query" class="downloadProgress" ng-show="node.progressVisible" flex></md-progress-linear>
+    <a class="btn btn-primary btn-xs pull-right" ng-click="downloadItem(this)">
+      <span class="glyphicon glyphicon-save"></span>
+    </a>
+    <a class="btn btn-primary btn-xs pull-right" layout-align="end center" ng-click="view()">
+      <span class="glyphicon glyphicon-eye-open"></span>
+    </a>
+  </div>
 </div>
 <ol ui-tree-nodes="" ng-model="node.nodes" ng-class="{hidden: collapsed}" style="cursor: default">
   <li ng-repeat="node in node.nodes" ui-tree-node ng-include="'downloadContentItem.htm'"></li>

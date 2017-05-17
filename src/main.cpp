@@ -5,6 +5,7 @@
 #include <QAbstractEventDispatcher>
 #include <QHostInfo>
 #include <QtConcurrent/QtConcurrent>
+#include <QFileInfo>
 
 #include "webserver.h"
 #include "ressourceaccess.h"
@@ -16,6 +17,8 @@
 #define DOWNLOADABLE_OBJECT_KEY "object"
 #define DOWNLOADABLE_LIST_KEY "list"
 #define DOWNLOADABLE_DATA_KEY "data"
+
+#define BASE_DOWNLOAD_DIR "C:/Users/jpalb/Downloads/"
 
 bool tryConnection(const QString& url)
 {
@@ -84,14 +87,21 @@ int main(int argc, char *argv[])
     });
 
     wServer.addGetDataService("GetDownloadableObjects", [&](const QString&, const GetParameters&) {
-        auto list = QDir("C:/Users/Jean-Pierre/Downloads").entryList(QDir::NoDotAndDotDot | QDir::Files | QDir::Dirs);
-        qDebug() << list;
+
+        auto list = QDir(BASE_DOWNLOAD_DIR).entryInfoList(QDir::NoDotAndDotDot | QDir::Files );
+
+        QStringList result;
+        for(const auto& item: list)
+            result += item.absoluteFilePath().replace(BASE_DOWNLOAD_DIR, "");
+
         return QVariantMap {
-            { DOWNLOADABLE_LIST_KEY, list }
+            { DOWNLOADABLE_LIST_KEY, result }
         };
     });
-            wServer.addGetDataService("GetDownloadableObject", [&](const QString&, const GetParameters& parameters) {
-        QString path = QString("C:/Users/Jean-Pierre/Downloads") + parameters[DOWNLOADABLE_OBJECT_KEY];
+    wServer.addGetDataService("GetDownloadableObject", [&](const QString&, const GetParameters& parameters) {
+        QString path = QString(BASE_DOWNLOAD_DIR) + parameters[DOWNLOADABLE_OBJECT_KEY];
+
+        QThread::sleep(5);
 
         QByteArray data;
         QFile file(path);
@@ -106,13 +116,10 @@ int main(int argc, char *argv[])
         QFuture<bool> futur = QtConcurrent::run(&tryConnection, QString("ws://localhost:5000"));
         futur.waitForFinished();
 
-        return QVariantMap{
-            { "status", futur.result() ? "check" : "error"}
-            };
+        return QVariantMap{ { "status", futur.result() ? "check" : "error"} };
             });
 
             wServer.addPostDataService("login", [&](QString user, QVariantMap data) {
-                qDebug() << "post tryed " << user << data;
                 return QVariantMap{
                     { "valid", true}
                 };
