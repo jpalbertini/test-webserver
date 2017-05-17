@@ -1,0 +1,11 @@
+<div ui-tree-handle class="tree-node tree-node-content" style="cursor: default">
+  <a class="btn btn-success btn-xs" ng-if="node.nodes && node.nodes.length > 0" data-nodrag ng-click="toggle(this)"><span
+        class="glyphicon"
+        ng-class="{
+          'glyphicon-chevron-right': collapsed,
+          'glyphicon-chevron-down': !collapsed
+        }"></span></a>{{node.title}}
+</div>
+<ol ui-tree-nodes="" ng-model="node.nodes" ng-class="{hidden: collapsed}" style="cursor: default">
+  <li ng-repeat="node in node.nodes" ui-tree-node ng-include="'downloadContentItem.htm'"></li>
+</ol>

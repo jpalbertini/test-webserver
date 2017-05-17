@@ -1,7 +1,15 @@
 <div ng-controller="DownloadContentController" layout="column">
-  <div layout="row">
+  <div layout="row" layout-wrap>
     <div ng-repeat="item in downloadables">
       <md-button class="md-raised" ng-click='downloadItem(item)'> {{ item }} </md-button>
     </div>
+  </div>
+
+
+  <div ui-tree id="tree-root" data-drag-enabled="false">
+    <ol ui-tree-nodes ng-model="data">
+      <li ng-repeat="node in data" ui-tree-node ng-include="'downloadContentItem.htm'">
+      </li>
+    </ol>
   </div>
 </div>

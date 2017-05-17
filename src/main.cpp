@@ -84,14 +84,14 @@ int main(int argc, char *argv[])
     });
 
     wServer.addGetDataService("GetDownloadableObjects", [&](const QString&, const GetParameters&) {
-        auto list = QDir(":/www").entryList(QDir::NoDotAndDotDot | QDir::Files);
+        auto list = QDir("C:/Users/Jean-Pierre/Downloads").entryList(QDir::NoDotAndDotDot | QDir::Files | QDir::Dirs);
         qDebug() << list;
         return QVariantMap {
             { DOWNLOADABLE_LIST_KEY, list }
         };
     });
             wServer.addGetDataService("GetDownloadableObject", [&](const QString&, const GetParameters& parameters) {
-        QString path = QString(":/www/") + parameters[DOWNLOADABLE_OBJECT_KEY];
+        QString path = QString("C:/Users/Jean-Pierre/Downloads") + parameters[DOWNLOADABLE_OBJECT_KEY];
 
         QByteArray data;
         QFile file(path);
