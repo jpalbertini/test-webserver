@@ -5,11 +5,11 @@
     </a>
     <span>{{node.title}}</span>
     <span ng-show="!node.progressVisible" flex></span>
-    <md-progress-linear md-mode="query" class="downloadProgress" ng-show="node.progressVisible" flex></md-progress-linear>
-    <a class="btn btn-primary btn-xs pull-right" ng-click="downloadItem(this)">
+    <md-progress-linear md-mode="query" class="downloadProgress" ng-show="node.progressVisible" ng-if="!node.nodes" flex></md-progress-linear>
+    <a class="btn btn-primary btn-xs pull-right" ng-click="downloadItem(this)" ng-if="!node.nodes">
       <span class="glyphicon glyphicon-save"></span>
     </a>
-    <a class="btn btn-primary btn-xs pull-right" layout-align="end center" ng-click="view()">
+    <a class="btn btn-primary btn-xs pull-right" layout-align="end center" ng-click="previewItem(this)" ng-if="!node.nodes">
       <span class="glyphicon glyphicon-eye-open"></span>
     </a>
   </div>

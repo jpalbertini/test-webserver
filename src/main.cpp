@@ -87,13 +87,19 @@ int main(int argc, char *argv[])
     });
 
     wServer.addGetDataService("GetDownloadableObjects", [&](const QString&, const GetParameters&) {
+        QVariantMap result;
 
-        auto list = QDir(BASE_DOWNLOAD_DIR).entryInfoList(QDir::NoDotAndDotDot | QDir::Files );
+        auto dirList = QDir(BASE_DOWNLOAD_DIR).entryInfoList(QDir::NoDotAndDotDot | QDir::Dirs );
+        for(const auto& dir: dirList)
+        {
+            QVariantList currentFileList;
+            for(const auto& item: QDir(dir.absoluteFilePath()).entryInfoList(QDir::NoDotAndDotDot | QDir::Files ))
+                currentFileList += item.fileName();
 
-        QStringList result;
-        for(const auto& item: list)
-            result += item.absoluteFilePath().replace(BASE_DOWNLOAD_DIR, "");
+            result[dir.fileName()] = currentFileList;
+        }
 
+        qDebug() << result;
         return QVariantMap {
             { DOWNLOADABLE_LIST_KEY, result }
         };
@@ -119,7 +125,7 @@ int main(int argc, char *argv[])
         return QVariantMap{ { "status", futur.result() ? "check" : "error"} };
             });
 
-            wServer.addPostDataService("login", [&](QString user, QVariantMap data) {
+            wServer.addPostDataService("login", [&](const QString&, const QVariantMap&) {
                 return QVariantMap{
                     { "valid", true}
                 };

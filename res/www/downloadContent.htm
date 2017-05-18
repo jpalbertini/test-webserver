@@ -1,10 +1,4 @@
 <div ng-controller="DownloadContentController" layout="column">
-  <div layout="row" layout-wrap>
-    <div ng-repeat="item in downloadables">
-      <md-button class="md-raised" ng-click='downloadItem(item)'> {{ item }} </md-button>
-    </div>
-  </div>
-
 
   <div ui-tree id="tree-root" data-drag-enabled="false">
     <ol ui-tree-nodes ng-model="downloadables">
@@ -12,4 +6,17 @@
       </li>
     </ol>
   </div>
+
+  <md-sidenav class="md-sidenav-right md-whiteframe-4dp" md-component-id="right">
+    <md-toolbar class="md-theme-light">
+      <h1 class="md-toolbar-tools">{{ currentFileName }}</h1>
+    </md-toolbar>
+    <md-content layout-padding>
+      <div layout="column">
+      <span flex>{{ currentFileContent }}</span>
+      <md-button ng-click="close()" class="md-primary"> Close </md-button>
+      </div>
+    </md-content>
+  </md-sidenav>
+
 </div>
