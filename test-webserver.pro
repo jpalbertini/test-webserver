@@ -12,14 +12,16 @@ TEMPLATE = app
 SOURCES += src/main.cpp \
             3rdparties/civetweb/src/civetweb.c \
             3rdparties/civetweb/src/CivetServer.cpp \
-    src/webserver.cpp
+            src/webserver.cpp \
+            src/websocketserver.cpp
 
 INCLUDEPATH += 3rdparties/civetweb/include inc
 
 HEADERS += 3rdparties/civetweb/include/civetweb.h \
             3rdparties/civetweb/include/CivetServer.h \
-    inc/webserver.h \
-    inc/ressourceaccess.h
+            inc/webserver.h \
+            inc/ressourceaccess.h \
+            inc/websocketserver.hpp
 
 
 DEFINES += QT_DEPRECATED_WARNINGS

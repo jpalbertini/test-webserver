@@ -8,6 +8,7 @@
 #include <QFileInfo>
 
 #include "webserver.h"
+#include "websocketserver.hpp"
 #include "ressourceaccess.h"
 
 #define DOWNLOADABLE_BASE_PATH ":/www/"
@@ -22,8 +23,6 @@
 
 bool tryConnection(const QString& url)
 {
-    static int cpt = 0;
-
     QWebSocket wSocket;
     wSocket.open(QUrl(url));
     do
@@ -34,13 +33,10 @@ bool tryConnection(const QString& url)
             QAbstractEventDispatcher* dispatcher = pThread->eventDispatcher();
             if(dispatcher)
                 dispatcher->processEvents(QEventLoop::AllEvents);
-            else cpt++;
         }
         QThread::msleep(100);
         qDebug() << "waiting";
-    }while(wSocket.state() == QAbstractSocket::ConnectingState && cpt < 10);
-
-    cpt = 0;
+    }while(wSocket.state() == QAbstractSocket::ConnectingState);
 
     return wSocket.state() == QAbstractSocket::ConnectedState;
 }
@@ -52,8 +48,8 @@ int main(int argc, char *argv[])
     WebServer wServer(&app);
     wServer.setBasePath("D:/dev/test-webserver/res/www");
     RessourceAccess rAccess(&app);
-    QWebSocketServer wsServer("TestServer", QWebSocketServer::NonSecureMode, &app);
-    qDebug() << "Listen: " << wsServer.listen(QHostAddress::Any, WS_PORT);
+    WebSocketServer wsServer(&app);
+    wsServer.start(WS_PORT);
 
     wServer.addConstant("HOST", QHostInfo::localHostName());
     wServer.addConstant("PORT", QString("%0").arg(WS_PORT));
@@ -72,18 +68,6 @@ int main(int argc, char *argv[])
             { "version_long", "1.2"},
             { "version_lon_long", "1.2.3.4.5"}
         };
-    });
-    wServer.addGetDataService("statistics", [&](const QString&, const GetParameters&) {
-        srand(QTime::currentTime().msec());
-        QVariantMap data;
-        data["A"] = rand() % 100;
-        data["B"] = rand() % 100;
-        data["C"] = rand() % 100;
-        data["D"] = rand() % 100;
-        data["E"] = rand() % 100;
-        data["F"] = rand() % 100;
-        data["G"] = rand() % 100;
-        return data;
     });
 
     wServer.addGetDataService("GetDownloadableObjects", [&](const QString&, const GetParameters&) {
@@ -123,15 +107,15 @@ int main(int argc, char *argv[])
         futur.waitForFinished();
 
         return QVariantMap{ { "status", futur.result() ? "check" : "error"} };
-            });
+    });
 
-            wServer.addPostDataService("login", [&](const QString&, const QVariantMap&) {
-                return QVariantMap{
-                    { "valid", true}
-                };
-            });
+    wServer.addPostDataService("login", [&](const QString&, const QVariantMap&) {
+        return QVariantMap{
+            { "valid", true}
+        };
+    });
 
-            wServer.start(8080);
+    wServer.start(8080);
 
-            return app.exec();
-        }
+    return app.exec();
+}
