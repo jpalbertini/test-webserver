@@ -1,4 +1,4 @@
-#include "webserver.h"
+#include "webserver.hpp"
 
 #include <QDebug>
 #include <QDir>
@@ -53,8 +53,11 @@ bool WebServer::handleGet(CivetServer *, mg_connection *conn)
 {
     const struct mg_request_info *req_info = mg_get_request_info(conn);
 
+    ClientInformations client;
     std::string user;
     CivetServer::getCookie(conn, "user", user);
+    client.username = QString::fromStdString(user);
+    client.ipAddress = QString::fromLocal8Bit(req_info->remote_addr);
 
     QString requestUri = QString::fromLocal8Bit(req_info->request_uri);
     requestUri.remove(0, 1);
@@ -72,7 +75,7 @@ bool WebServer::handleGet(CivetServer *, mg_connection *conn)
 
     if(getDataServices.contains(requestUri))
     {
-        auto data = getDataServices[requestUri](QString::fromStdString(user), parameters);
+        auto data = getDataServices[requestUri](client, parameters);
         reply(conn, data);
         qDebug() << "served get service data " << requestUri;
         return true;
@@ -119,11 +122,16 @@ bool WebServer::handleGet(CivetServer *, mg_connection *conn)
 bool WebServer::handlePost(CivetServer*, mg_connection * conn)
 {
     const struct mg_request_info *req_info = mg_get_request_info(conn);
+
+    ClientInformations client;
     std::string user;
-    CivetServer::getCookie(conn,"user", user);
+    CivetServer::getCookie(conn, "user", user);
+    client.username = QString::fromStdString(user);
+    client.ipAddress = QString::fromLocal8Bit(req_info->remote_addr);
 
     QString requestUri = QString::fromLocal8Bit(req_info->request_uri);
-    requestUri.remove(0, 1);
+    requestUri.remove(0, 1);    
+
 
     if(postDataServices.contains(requestUri))
     {
@@ -136,7 +144,7 @@ bool WebServer::handlePost(CivetServer*, mg_connection * conn)
         QJsonDocument doc = QJsonDocument::fromJson(rawData);
 
         auto sentData = doc.object().toVariantMap();
-        auto data = postDataServices[requestUri](QString::fromStdString(user), sentData);
+        auto data = postDataServices[requestUri](client, sentData);
         reply(conn, data);
         qDebug() << "served post service data " << requestUri << doc.object().toVariantMap();
         return true;

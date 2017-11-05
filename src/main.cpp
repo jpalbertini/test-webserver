@@ -7,9 +7,9 @@
 #include <QtConcurrent/QtConcurrent>
 #include <QFileInfo>
 
-#include "webserver.h"
+#include "webserver.hpp"
 #include "websocketserver.hpp"
-#include "ressourceaccess.h"
+#include "ressourceaccess.hpp"
 
 #define DOWNLOADABLE_BASE_PATH ":/www/"
 
@@ -45,6 +45,8 @@ int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
 
+    QMap<QString, QString> usernamesByIPs;
+
     WebServer wServer(&app);
     wServer.setBasePath("D:/dev/test-webserver/res/www");
     RessourceAccess rAccess(&app);
@@ -58,10 +60,10 @@ int main(int argc, char *argv[])
     wServer.addConstant("DOWNLOADABLE_LIST_KEY", DOWNLOADABLE_LIST_KEY);
     wServer.addConstant("DOWNLOADABLE_DATA_KEY", DOWNLOADABLE_DATA_KEY);
 
-    wServer.addGetDataService("data", [&](const QString&, const GetParameters&) {
+    wServer.addGetDataService("data", [&](const ClientInformations&, const GetParameters&) {
         return rAccess.getData();
     });
-    wServer.addGetDataService("version", [&](const QString&, const GetParameters&) {
+    wServer.addGetDataService("version", [&](const ClientInformations&, const GetParameters&) {
         return QVariantMap{
             { "version", "1.2.3"},
             { "ver", "1.2.3.4.5"},
@@ -70,7 +72,7 @@ int main(int argc, char *argv[])
         };
     });
 
-    wServer.addGetDataService("GetDownloadableObjects", [&](const QString&, const GetParameters&) {
+    wServer.addGetDataService("GetDownloadableObjects", [&](const ClientInformations&, const GetParameters&) {
         QVariantMap result;
 
         auto dirList = QDir(BASE_DOWNLOAD_DIR).entryInfoList(QDir::NoDotAndDotDot | QDir::Dirs );
@@ -88,7 +90,7 @@ int main(int argc, char *argv[])
             { DOWNLOADABLE_LIST_KEY, result }
         };
     });
-    wServer.addGetDataService("GetDownloadableObject", [&](const QString&, const GetParameters& parameters) {
+    wServer.addGetDataService("GetDownloadableObject", [&](const ClientInformations&, const GetParameters& parameters) {
         QString path = QString(BASE_DOWNLOAD_DIR) + parameters[DOWNLOADABLE_OBJECT_KEY];
 
         QThread::sleep(5);
@@ -102,14 +104,20 @@ int main(int argc, char *argv[])
             { DOWNLOADABLE_DATA_KEY, data }
         };
     });
-    wServer.addGetDataService("testAliveConnection", [&](const QString&, const GetParameters&) {
+    wServer.addGetDataService("testAliveConnection", [&](const ClientInformations&, const GetParameters&) {
         QFuture<bool> futur = QtConcurrent::run(&tryConnection, QString("ws://localhost:5000"));
         futur.waitForFinished();
 
         return QVariantMap{ { "status", futur.result() ? "check" : "error"} };
     });
 
-    wServer.addPostDataService("login", [&](const QString&, const QVariantMap&) {
+
+    wServer.addGetDataService("getUsername", [&](const ClientInformations& client, const GetParameters&) {
+        return QVariantMap{ { "user", usernamesByIPs[client.ipAddress] } };
+    });
+
+    wServer.addPostDataService("login", [&](const ClientInformations& client, const QVariantMap& input) {
+        usernamesByIPs[client.ipAddress] = input["user"].toString();
         return QVariantMap{
             { "valid", true}
         };
